@@ -127,11 +127,16 @@ class BodyParser {
                 Promise.all(res.filter(item => !!item.done).map(item => item.done))
                     .then(() => {
                         const resData = res.reduce((data, item) => {
-                            const field = {
-                                value: item.value,
-                                name: item.name,
-                                filename: item.filename, 
-                                contentType: item.contentType
+                            let field = null;
+                            if (item.filename) {
+                                field = {
+                                    value: item.value,
+                                    name: item.name,
+                                    filename: item.filename, 
+                                    contentType: item.contentType
+                                }
+                            } else {
+                                field = item.value;
                             }
                             if (!data[item.name]) {
                                 data[item.name] = field;
