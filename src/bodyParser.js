@@ -27,12 +27,15 @@ function parseFieldStr(fieldStr) {
 
 class BodyParser {
     constructor(req) {
-        this.boundary = Buffer.from(
-            '\r\n--' + req.headers['content-type'].match(/(?<=boundary\=)[^\;]*/)[0],
-            'utf8'
-        )
-        this.req = req;
+        this.boundary = null;
         this.curField = null;
+        this.req = req;
+        if (/multipart\/form-data/.test(req.headers['content-type'])) {
+            this.boundary = Buffer.from(
+                '\r\n--' + req.headers['content-type'].match(/(?<=boundary\=)[^\;]*/)[0],
+                'utf8'
+            )
+        }
     }
     parse(){
         const contentType = this.req.headers["content-type"];
