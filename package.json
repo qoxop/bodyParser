@@ -1,11 +1,12 @@
 {
   "name": "post-bodyparser",
-  "version": "1.0.0",
-  "description": "基于原生 Node 的 http POST方法请求体解析，支持 multipart/form-data、application/json、application/x-www-form-urlencoded",
+  "version": "1.0.2",
+  "description": "基于 Node 的 http POST方法请求体解析，支持 multipart/form-data、application/json、application/x-www-form-urlencoded",
   "main": "index.js",
   "repository": "git@github.com:qoxop/bodyParser.git",
   "author": "张集伟 <oblue.demo@gmail.com>",
   "license": "MIT",
+  "keywords": ["bodyparser", "http", "node"],
   "dependencies": {
     "uuid": "^3.3.3"
   }

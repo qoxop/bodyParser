@@ -1,8 +1,8 @@
 # bodyParser
-基于原生 Node 的 http POST方法请求体解析，支持 multipart/form-data、application/json、application/x-www-form-urlencoded
+基于 Node 的 http POST方法请求体解析，支持 multipart/form-data、application/json、application/x-www-form-urlencoded
 
 ## 安装
-依赖 node v10.0.0
+依赖 node v7.6.0 及以上
 ```javascript
 npm install post-bodyparser
 ```
@@ -10,9 +10,16 @@ npm install post-bodyparser
 ## 使用
 ```javascript
 const BodyParser = require('post-bodyparser')
+const options = {
+    uploadpath: __dirname
+}
 const body = await new BodyParser(req).parse()
 ```
-- 参数(req): node原生的 `http.IncomingMessage` 类的实例(如果使用`koa`框架可以用`ctx.req`获取)
+- 参数
+    - req: node 的 `http.IncomingMessage` 类的实例(如果使用`koa`框架可以用`ctx.req`获取)
+    - options: 可选
+        - uploadpath，文件的上传路径，默认是系统的临时目录
+        - encoding，`http.IncomingMessage` 实例执行`setEncoding` 方法，默认不执行
 - 返回值(body): 一个`key-value`对象, 如果请求中存在多个相同的`name`字段, `value`将被解析为数组。
 
 
@@ -63,9 +70,9 @@ const body = await parser.urlencoded()
 ```javascript
 const uploadMiddlewareMaker = require('post-bodyparser/koa')
 
-const limit = 1024 * 1024 * 10; // 限制上传文件的大小， 默认1000M
+const options = {max: 1024 * 1024 * 10, uploadpath: __dirname}
 const needThrow = true; // 若遇到超过限制或不符合的content-type时是否抛出异常
-const uploadMiddleware = uploadMiddlewareMaker(limit, needThrow);
+const uploadMiddleware = uploadMiddlewareMaker(options, needThrow);
 
 // 注册 koa 中间件
 app.use(uploadMiddleware)
