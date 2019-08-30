@@ -9,12 +9,12 @@ const tempPath = fs.mkdtempSync(`${os.tmpdir()}${sep}`);
 const LF = 10; // \n
 const CR = 13; // \r
 
-function parseFieldStr(fieldStr) {
+function parseFieldStr(fieldStr, uploadpath) {
     const name = (fieldStr.match(/(?<=name\=\")[^\"]*/g) || [])[0]
     const filename = (fieldStr.match(/(?<=filename\=\")[^\"]*/g) || [])[0]
     const contentType = (fieldStr.match(/(?<=Content-Type:\s).*\/.*/g) || [])[0]
     if (filename) {
-        const value = join(tempPath, `/${uuidV4()}.${filename}`);
+        const value = join(uploadpath, `/${uuidV4()}.${filename}`);
         const writable = fs.createWriteStream(value);
         const done = new Promise((rs, rj) => {
             writable.on('finish', () => rs(value))
@@ -26,15 +26,19 @@ function parseFieldStr(fieldStr) {
 }
 
 class BodyParser {
-    constructor(req) {
+    constructor(req, options) {
+        const opts = Object.assign({uploadpath: tempPath, encoding: undefined}, options)
         this.boundary = null;
         this.curField = null;
         this.req = req;
+        this.uploadpath = opts.uploadpath;
         if (/multipart\/form-data/.test(req.headers['content-type'])) {
             this.boundary = Buffer.from(
                 '\r\n--' + req.headers['content-type'].match(/(?<=boundary\=)[^\;]*/)[0],
                 'utf8'
             )
+        } else if (opts.encoding) {
+            this.req.setEncoding(options.encoding)
         }
     }
     parse(){
@@ -70,7 +74,7 @@ class BodyParser {
                     fieldBytes.push(byte)
                     if (byte === LF && last === CR && llast === LF) {
                         const fieldStr = Buffer.from(fieldBytes).toString();
-                        this.curField = parseFieldStr(fieldStr);
+                        this.curField = parseFieldStr(fieldStr, this.uploadpath);
                         readContentValue = true; last = null; llast = null; fieldBytes = [];
                         enhancedArr = EnhanceArray([])
                         if (this.curField.writable) {
