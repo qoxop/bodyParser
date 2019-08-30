@@ -10,9 +10,9 @@ const LF = 10; // \n
 const CR = 13; // \r
 
 function parseFieldStr(fieldStr, uploadpath) {
-    const name = (fieldStr.match(/(?<=name\=\")[^\"]*/g) || [])[0]
-    const filename = (fieldStr.match(/(?<=filename\=\")[^\"]*/g) || [])[0]
-    const contentType = (fieldStr.match(/(?<=Content-Type:\s).*\/.*/g) || [])[0]
+    const name = (fieldStr.match(/name\=\"([^\"]*)/) || [])[1]
+    const filename = (fieldStr.match(/filename\=\"([^\"]*)/) || [])[1]
+    const contentType = (fieldStr.match(/Content-Type:\s(.*\/.*)/) || [])[1]
     if (filename) {
         const value = join(uploadpath, `/${uuidV4()}.${filename}`);
         const writable = fs.createWriteStream(value);
@@ -34,7 +34,7 @@ class BodyParser {
         this.uploadpath = opts.uploadpath;
         if (/multipart\/form-data/.test(req.headers['content-type'])) {
             this.boundary = Buffer.from(
-                '\r\n--' + req.headers['content-type'].match(/(?<=boundary\=)[^\;]*/)[0],
+                '\r\n--' + req.headers['content-type'].match(/boundary\=([^\;]*)/)[1],
                 'utf8'
             )
         } else if (opts.encoding) {
