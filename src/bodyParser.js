@@ -123,6 +123,9 @@ class BodyParser {
         const bodyStr = await collectReadableToStr(this.req);
         return querystring.parse(bodyStr)
     }
+    async text() {
+        return await collectReadableToStr(this.req);
+    }
     _done(res) {
         const req = this.req;
         return new Promise((resolve, reject) => {
